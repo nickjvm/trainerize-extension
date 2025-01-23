@@ -1,12 +1,35 @@
-chrome.runtime.onInstalled.addListener(() => {
+const trainerize = '.trainerize.com/app'
+
+chrome.runtime.onInstalled.addListener(async () => {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+
     chrome.action.setBadgeText({
-      text: "OFF",
+      text: tab.url.includes(trainerize) ? "OFF" : "",
     });
 });
 
-// const extensions = 'https://developer.chrome.com/docs/extensions';
-// const webstore = 'https://developer.chrome.com/docs/webstore';
-const trainerize = '.trainerize.com/app'
+
+//listen for new tab to be activated
+chrome.tabs.onActivated.addListener(async function(activeInfo) {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+
+    if (!tab.url.includes(trainerize)) {
+        await chrome.action.setBadgeText({
+            tabId: tab.id,
+            text: '',
+        });
+    } else {
+        await chrome.action.setBadgeText({
+            tabId: tab.id,
+            text: await chrome.action.getBadgeText({ tabId: tab.id }) || "OFF"
+        });
+    }
+});
+
+//listen for current tab to be changed
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+    console.log('onUpdated', { tabId, changeInfo, tab})
+});
 
 chrome.action.onClicked.addListener(async (tab) => {
   if (tab.url.includes(trainerize)) {
@@ -43,6 +66,12 @@ chrome.action.onClicked.addListener(async (tab) => {
             func : cleanup,
         })
     }
+  } else {
+        // Set the action badge to the next state
+        await chrome.action.setBadgeText({
+            tabId: tab.id,
+            text: '',
+        });
   }
 });
 

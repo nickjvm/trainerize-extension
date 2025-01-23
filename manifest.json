@@ -1,12 +1,15 @@
 {
-    "name": "Hello Extensions of the world",
-    "description": "Base Level Extension",
+    "name": "Trainerize Weekly Meal Export",
+    "description": "Export the past 7 days of meals as a table that can be printed or downloaded as a PDF",
     "version": "1.0",
     "manifest_version": 3,
     "action": {
-      "default_icon": "hello_extensions.png"
+      "default_icon": "assets/apple-icon-57x57.png"
     },
-    "permissions":["activeTab", "scripting"],
+    "icons": {
+        "57": "assets/apple-icon-57x57.png"
+    },
+    "permissions":["tabs", "activeTab", "scripting"],
     "background": {
         "service_worker": "background.js"
     },
@@ -14,9 +17,7 @@
         {
             "js": ["scripts/content.js"],
             "matches": [
-                "https://*.trainerize.com/*",
-                "https://developer.chrome.com/docs/extensions/*",
-                "https://developer.chrome.com/docs/webstore/*"
+                "https://*.trainerize.com/app/*"
             ]
         }
     ]
