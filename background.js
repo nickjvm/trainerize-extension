@@ -3,14 +3,20 @@ const trainerize = '.trainerize.com/app'
 chrome.runtime.onInstalled.addListener(async () => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
 
-    chrome.action.setBadgeText({
-      text: tab.url.includes(trainerize) ? "OFF" : "",
+    await chrome.action.setBadgeText({
+        text: tab.url.includes(trainerize) ? "OFF" : "",
     });
+    if (!tab.url.includes(trainerize)) {
+        await chrome.action.setIcon({
+            tabId: tab.id,
+            path: './assets/disabled.png',
+        })
+    }
 });
 
 
 //listen for new tab to be activated
-chrome.tabs.onActivated.addListener(async function(activeInfo) {
+chrome.tabs.onActivated.addListener(async function (activeInfo) {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
 
     if (!tab.url.includes(trainerize)) {
@@ -18,87 +24,96 @@ chrome.tabs.onActivated.addListener(async function(activeInfo) {
             tabId: tab.id,
             text: '',
         });
+        await chrome.action.setIcon({
+            tabId: tab.id,
+            path: './assets/disabled.png',
+        })
     } else {
         await chrome.action.setBadgeText({
             tabId: tab.id,
             text: await chrome.action.getBadgeText({ tabId: tab.id }) || "OFF"
         });
+
+        await chrome.action.setIcon({
+            tabId: tab.id,
+            path: './assets/apple-icon-57x57.png',
+        })
     }
 });
 
 //listen for current tab to be changed
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-    console.log('onUpdated', { tabId, changeInfo, tab})
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    console.log('onUpdated', { tabId, changeInfo, tab })
 });
 
 chrome.action.onClicked.addListener(async (tab) => {
-  if (tab.url.includes(trainerize)) {
-    // Retrieve the action badge to check if the extension is 'ON' or 'OFF'
-    const prevState = await chrome.action.getBadgeText({ tabId: tab.id });
-    // Next state will always be the opposite
-    const nextState = prevState === 'ON' ? 'OFF' : 'ON';
+    if (tab.url.includes(trainerize)) {
+        // Retrieve the action badge to check if the extension is 'ON' or 'OFF'
+        const prevState = await chrome.action.getBadgeText({ tabId: tab.id });
+        // Next state will always be the opposite
+        const nextState = prevState === 'ON' ? 'OFF' : 'ON';
 
-    // Set the action badge to the next state
-    await chrome.action.setBadgeText({
-      tabId: tab.id,
-      text: nextState,
-    });
-
-    if (nextState === "ON") {
-        // Insert the CSS file when the user turns the extension on
-        await chrome.scripting.insertCSS({
-            files: ["focus-mode.css"],
-            target: { tabId: tab.id },
-        });
-        await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            files : [ "script.js" ],
-        })
-    } else if (nextState === "OFF") {
-        // Remove the CSS file when the user turns the extension off
-        await chrome.scripting.removeCSS({
-            files: ["focus-mode.css"],
-            target: { tabId: tab.id },
+        // Set the action badge to the next state
+        await chrome.action.setBadgeText({
+            tabId: tab.id,
+            text: nextState,
         });
 
-        await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            func : cleanup,
-        })
-    }
-  } else {
+        if (nextState === "ON") {
+            // Insert the CSS file when the user turns the extension on
+            await chrome.scripting.insertCSS({
+                files: ["focus-mode.css"],
+                target: { tabId: tab.id },
+            });
+            await chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                files: ["script.js"],
+            })
+        } else if (nextState === "OFF") {
+            // Remove the CSS file when the user turns the extension off
+            await chrome.scripting.removeCSS({
+                files: ["focus-mode.css"],
+                target: { tabId: tab.id },
+            });
+
+            await chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                func: cleanup,
+            })
+        }
+    } else {
         // Set the action badge to the next state
         await chrome.action.setBadgeText({
             tabId: tab.id,
             text: '',
         });
-  }
+    }
 });
 
 chrome.runtime.onMessage.addListener(
-    async function(request, sender, sendResponse) {
-      console.log(sender.tab ?
-                  "from a content script:" + sender.tab.url :
-                  "from the extension");
-      if (request.status === "complete") {
-        await chrome.action.setBadgeText({
-            tabId: sender.tab.id,
-            text: 'OFF',
-          });
+    async function (request, sender, sendResponse) {
+        console.log(sender.tab ?
+            "from a content script:" + sender.tab.url :
+            "from the extension");
+        if (request.status === "complete") {
+            await chrome.action.setBadgeText({
+                tabId: sender.tab.id,
+                text: 'OFF',
+            });
 
-          await chrome.scripting.removeCSS({
-            files: ["focus-mode.css"],
-            target: { tabId: sender.tab.id },
-        });
+            await chrome.scripting.removeCSS({
+                files: ["focus-mode.css"],
+                target: { tabId: sender.tab.id },
+            });
 
-        await chrome.scripting.executeScript({
-            target: { tabId: sender.tab.id },
-            func : cleanup,
-        })
-      }
-      return true
+            await chrome.scripting.executeScript({
+                target: { tabId: sender.tab.id },
+                func: cleanup,
+            })
+        }
+        return true
     }
-  );
+);
 
 
 function cleanup() {
