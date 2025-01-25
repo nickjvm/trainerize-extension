@@ -105,22 +105,6 @@ function getCookie(name) {
             fiber: 0
         })
 
-        const averageTable = `
-            <table class="table summary">
-                <tr>
-                    <th colspan="4"><h2>Weekly Meal Log </h2></th>
-                </tr>
-                <tr>
-                    <th colspan="4">Macro averages:</th>
-                <tr>
-                    <td>${Math.round(macros.calories / week.length)} Calories</td>
-                    <td>${Math.round(macros.protein / week.length)}g Protein</td>
-                    <td>${Math.round(macros.carbs / week.length)}g Carbs (${Math.round(macros.fiber / week.length)}g fiber)</td>
-                    <td>${Math.round(macros.fat / week.length)}g Fat</td>
-                </tr>
-            </table>
-        `
-
         const summary = `
             <div class="section">
                 <h1>Weekly Meal Report (${formatDate(week[0])} - ${formatDate(week[week.length - 1])})</h1>
@@ -168,51 +152,95 @@ function getCookie(name) {
                 `).join('')}
             </div>
         `
-
         document.body.classList.add('custom-trainerize-export-active')
         document.body.insertAdjacentHTML('afterbegin', '<div id="custom-trainerize-export"></div>')
         document.querySelector('#custom-trainerize-export').insertAdjacentHTML('afterbegin', summary)
 
         logs.map(data => {
-            const template = `
-            <table class="table day" cellspacing="0" cellpadding="0" >
-              <thead>
-              <tr>
-                <td colspan="5" style="width: 200px !important;">${formatDate(data.nutrition.date, {
-                weekday: "short",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-            })}</td>
-              </tr>
-              <tr>
-                  <td colspan="5">
-                    ${Math.round(data.nutrition.calories)} cals, ${Math.round(data.nutrition.proteinGrams)}g P, ${Math.round(data.nutrition.carbsGrams)}g C (${Math.round(data.nutrition.nutrients.find(n => n.nutrNo === 291)?.nutrVal)}g fiber), ${Math.round(data.nutrition.fatGrams)}g F
-                  </td>
-              </thead>
-              <tbody>
-                <tr>
-                <td colspan="5">
-                  ${data.nutrition.meals.map(meal => `
-                    <table class="table meal" style="margin-bottom: 4px;">
-                      <tr>
-                        <td colspan="2"><strong>${new Date(meal.mealTime).toLocaleTimeString()} - ${meal.name} - ${Math.round(meal.caloriesSummary)} cal, ${Math.round(meal.proteinSummary)}P, ${Math.round(meal.carbsSummary)}C, ${Math.round(meal.fatSummary)}F</strong></td>
-                      </tr>
-                      ${meal.foods.map(food => `
-                        <tr>
-                          <td style="white-space: nowrap; width: 100px;">${food.amount} ${food.unit}</td>
-                          <td>${food.name}</td>
-                        </tr>
-                      `).join('')}
-                    </table>
-                  `).join('')}
-                  
-                </td>
-                </tr>
-              </tbody>
-            </table>`
-
-            document.body.querySelector('#custom-trainerize-export').insertAdjacentHTML('beforeend', template)
+            const entryTemplate = `
+                <div class="pagebreak"></div>
+                <section class="daily-entry">
+                    <header>
+                        <h2>${formatDate(data.nutrition.date, {
+                            weekday: "short",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                        })}</h2>
+                    </header>
+                    <div class="bar-container">
+                        <div class="bar">
+                            <div class="protein" style="width: ${data.nutrition.proteinPercent * 100}%"></div>
+                            <div class="carbs" style="width: ${data.nutrition.carbsPercent * 100}%"></div>
+                            <div class="fat" style="width: ${data.nutrition.fatPercent * 100}%"></div>
+                        </div>
+                        <div class="legend">
+                            <div class="label">
+                                <!-- ${Math.round(data.nutrition.nutrients.find(n => n.nutrNo === 291)?.nutrVal)}g fiber -->
+                                <div class="icon protein"></div>Protein ${Math.round(data.nutrition.proteinGrams)}g (${Math.round(data.nutrition.proteinPercent * 100)}%)
+                            </div>
+                            <div class="label">
+                                <div class="icon carbs"></div>Carbs ${Math.round(data.nutrition.carbsGrams)}g (${Math.round(data.nutrition.carbsPercent * 100)}%)
+                            </div>
+                            <div class="label">
+                                <div class="icon fat"></div>Fat ${Math.round(data.nutrition.fatGrams)}g (${Math.round(data.nutrition.fatPercent * 100)}%)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar">
+                            <div class="calories" style="width: ${(data.nutrition.calories / data.nutrition.goal.caloricGoal) * 100}%"></div>
+                        </div>
+                        <div class="legend">
+                        <div class="label">
+                            <span class="icon calories"></span>Calories ${Math.round(data.nutrition.calories)}
+                        </div>
+                            <div class="label">${data.nutrition.goal.caloricGoal - data.nutrition.calories} remaining</div>
+                        </div>
+                    </div>
+                    ${data.nutrition.meals.map(meal => `
+                        <div class="meal">
+                            <h3>
+                                <span class="meal--timestamp">${new Date(meal.mealTime).toLocaleString('en-US', { hour: '2-digit', hour12: true, minute: '2-digit' })}</span>
+                                <span class="meal--type">${meal.name}</span>
+                                <span class="meal--calories">${Math.round(meal.caloriesSummary)} Calories</span>
+                            </h3>
+                            <div class="bar-container">
+                                <div class="bar">
+                                    <div class="protein" style="width: ${meal.proteinPercent}%"></div>
+                                    <div class="carbs" style="width: ${meal.carbsPercent}%"></div>
+                                    <div class="fat" style="width: ${meal.fatPercent}%"></div>
+                                </div>
+                                <div class="legend">
+                                    <div class="label">
+                                        <div class="icon protein"></div>Protein ${Math.round(meal.proteinSummary)} (${Math.round(meal.proteinPercent)}%)
+                                    </div>
+                                    <div class="label">
+                                        <div class="icon carbs"></div>Carbs ${Math.round(meal.carbsSummary)} (${Math.round(meal.carbsPercent)}%)
+                                    </div>
+                                    <div class="label">
+                                        <div class="icon fat"></div>Fat ${Math.round(meal.fatSummary)} (${Math.round(meal.fatPercent)}%)
+                                    </div>
+                                </div>
+                            </div>
+                            <ul class="meal-items">
+                                ${meal.foods.map(food => `
+                                    <li class="meal-item">
+                                        <div>
+                                            <p class="meal-item--name">${food.name}</p>
+                                            <p class="meal-item--size">${food.amount} ${food.unit}</p>
+                                        </div>
+                                        <div class="meal-item--calories">
+                                        ${Math.round(food.calories)} cal
+                                        </div>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `).join('')}
+                </section>
+            `
+            document.body.querySelector('#custom-trainerize-export').insertAdjacentHTML('beforeend', entryTemplate)
         })
         // window.print()
 

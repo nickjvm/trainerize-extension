@@ -18,6 +18,21 @@ article {
     margin: auto;
     max-width: 700px;
 } */
+
+body {
+    padding: 20px !important;
+}
+
+
+@media print {
+    body {
+      padding: 0 !important;
+    }
+    .pagebreak {
+        page-break-before: always;
+    }
+  }
+
 body > *:not(#custom-trainerize-export) {
   display: none;
 }
@@ -43,13 +58,13 @@ body > *:not(#custom-trainerize-export) {
 #custom-trainerize-export .table th {
 
 } */
-#custom-trainerize-export .table:not(.summary) {
-  page-break-inside: auto;
+#custom-trainerize-export .table:not(.summary), .daily-entry {
+  /* page-break-inside: auto; */
 }
 
-#custom-trainerize-export .table:not(.summary) tr {
-  page-break-inside: avoid;
-  page-break-after: auto;
+#custom-trainerize-export .table:not(.summary) tr, .daily-entry > *{
+  /* page-break-inside: avoid;
+  page-break-after: auto; */
 }
 
 table.table.meal td {
@@ -136,7 +151,7 @@ body {
   margin-top: 5px;
 }
 
-.legend .label::first-letter{
+.legend .label::first-letter {
     text-transform: capitalize;
 }
 
@@ -150,3 +165,86 @@ body {
 .table tbody th {
   text-align: left;
 }
+
+
+.daily-entry {
+    margin-bottom: 30px;
+    border: 1px solid #EFEFEF;
+    padding: 0 8px 8px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.daily-entry h2 {
+    text-align: left !important;
+    margin: 8px 0;
+    font-size: 1.125rem !important;
+}
+.meal {
+    background: #FAFAFA;
+    margin: 0 -8px;
+    padding: 16px;
+    border-bottom: 1px solid #E3E3E3;
+    padding-bottom: 16px;
+  }
+  
+  .meal:last-child {
+    margin-bottom: -8px;
+    padding-bottom: 16px;
+    border-bottom-width: 0;
+  }
+  
+  .meal h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 1rem;
+  }
+
+  .meal .meal--type {
+    text-transform: capitalize;
+  }
+  .meal .meal--calories {
+    margin-left: auto;
+    font-size: 1rem;
+    font-weight: normal;
+  }
+  
+  .meal--type {
+    font-size: 1rem;
+  }
+  .meal--timestamp {
+    font-size: 1rem;
+    font-weight: normal;
+  }
+  
+  .meal-items {
+    list-style-type: none;
+    padding: 0;
+    margin: 16px 0 0;
+  }
+  .meal-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: space-between;
+  }
+  
+  .meal-item:not(:last-child) {
+    margin: 0 0 .5rem;
+    padding: 0 0 .5rem;
+    border-bottom: 1px solid #E3E3E3;
+  }
+  
+  .meal-item--name {
+    font-size: 1rem;
+  }
+  
+  .meal-item--size {
+    font-size: .75rem;
+  }
+  .meal-item p {
+    margin: 0;
+  }
+  
