@@ -21,12 +21,21 @@ function getCookie(name) {
     if (parts.length === 2) return parts.pop().split(';').shift();
 }
 
+
 (function () {
     const week = last7Days(1)
     const token = getCookie('tz_uatoken')
     const uid = getCookie('tz_uid')
     if (!token || !uid) {
         return alert('Please sign in again.')
+    }
+
+    function macroGoal(macro) {
+        return {
+            label: `${Math.round((macro.grams / macro.goal) * 100)}%`,
+            average: `${Math.round(macro.grams / week.length)}g`,
+            percentage: (macro.grams / macro.goal) * 100 ,
+        }
     }
 
     const requests = week.map(date => fetch('https://api.trainerize.com/v03/dailyNutrition/get', {
@@ -63,19 +72,43 @@ function getCookie(name) {
     Promise.all(requests).then((logs) => {
         const macros = logs.reduce((acc, data) => {
             acc.calories += data.nutrition.calories
-            acc.protein += data.nutrition.proteinGrams
-            acc.carbs += data.nutrition.carbsGrams
-            acc.fat += data.nutrition.fatGrams
+            acc.caloricGoal += data.nutrition.goal.caloricGoal 
+            acc.protein.grams += data.nutrition.proteinGrams
+            acc.protein.percent += data.nutrition.proteinPercent
+            acc.protein.goal += data.nutrition.goal.proteinGrams
+            acc.carbs.grams += data.nutrition.carbsGrams
+            acc.carbs.percent += data.nutrition.carbsPercent
+            acc.carbs.goal += data.nutrition.goal.carbsGrams
+            acc.fat.grams += data.nutrition.fatGrams
+            acc.fat.percent += data.nutrition.fatPercent
+            acc.fat.goal += data.nutrition.goal.fatGrams
             acc.fiber += data.nutrition.nutrients.find(n => n.nutrNo === 291)?.nutrVal
             return acc
         }, {
-            calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0
+            calories: 0, 
+            caloricGoal: 0,
+            protein: {
+                goal: 0,
+                percent: 0,
+                grams: 0,
+            },
+            carbs: {
+                goal: 0,
+                percent: 0,
+                grams: 0,
+            },
+            fat: {
+                goal: 0,
+                percent: 0,
+                grams: 0,
+            },
+            fiber: 0
         })
 
         const averageTable = `
             <table class="table summary">
                 <tr>
-                    <th colspan="4"><h2>Weekly Meal Log (${formatDate(week[0])} - ${formatDate(week[week.length - 1])})</h2></th>
+                    <th colspan="4"><h2>Weekly Meal Log </h2></th>
                 </tr>
                 <tr>
                     <th colspan="4">Macro averages:</th>
@@ -88,9 +121,57 @@ function getCookie(name) {
             </table>
         `
 
+        const summary = `
+            <div class="section">
+                <h1>Weekly Meal Report (${formatDate(week[0])} - ${formatDate(week[week.length - 1])})</h1>
+                <h2>Macro distribution</h2>
+                <div class="bar-container">
+                    <div class="bar">
+                        <div class="protein" style="width: ${(macros.protein.percent * 100) / week.length}%"></div>
+                        <div class="carbs" style="width: ${(macros.carbs.percent * 100) / week.length}%"></div>
+                        <div class="fat" style="width: ${(macros.fat.percent * 100) / week.length}%"></div>
+                    </div>
+                    <div class="legend">
+                        <div class="label">
+                            <div class="icon protein"></div>Protein (${Math.round((macros.protein.percent * 100) / week.length)}%)
+                        </div>
+                        <div class="label">
+                            <div class="icon carbs"></div>Carbs (${Math.round((macros.carbs.percent * 100) / week.length)}%)
+                        </div>
+                        <div class="label">
+                            <div class="icon fat"></div>Fat (${Math.round((macros.fat.percent * 100) / week.length)}%)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="section">
+                <h2>Goals</h2>
+                <div class="bar-container">
+                    <div class="bar">
+                        <div class="calories" style="width: ${(macros.calories / macros.caloricGoal) * 100}%"></div>
+                    </div>
+                    <div class="legend">
+                        <div class="label">Calories ${Math.round(macros.caloricGoal / week.length)}</div>
+                        <div class="label">${Math.round((macros.calories / macros.caloricGoal) * 100)}% (avg ${Math.round(macros.calories / week.length)})</div>
+                    </div>
+                </div>
+                ${['protein', 'carbs', 'fat'].map(macro => `
+                    <div class="bar-container">
+                        <div class="bar">
+                            <div class="${macro}" style="width: ${macroGoal(macros[macro]).percentage}%"></div>
+                        </div>
+                        <div class="legend">
+                            <div class="label">${macro} ${Math.round(macros[macro].goal / week.length)}g</div>
+                            <div class="label">${macroGoal(macros[macro]).label} (avg ${macroGoal(macros[macro]).average})</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `
+
         document.body.classList.add('custom-trainerize-export-active')
         document.body.insertAdjacentHTML('afterbegin', '<div id="custom-trainerize-export"></div>')
-        document.querySelector('#custom-trainerize-export').insertAdjacentHTML('afterbegin', averageTable)
+        document.querySelector('#custom-trainerize-export').insertAdjacentHTML('afterbegin', summary)
 
         logs.map(data => {
             const template = `
@@ -133,7 +214,7 @@ function getCookie(name) {
 
             document.body.querySelector('#custom-trainerize-export').insertAdjacentHTML('beforeend', template)
         })
-        window.print()
+        // window.print()
 
     })
 
