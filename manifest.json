@@ -12,13 +12,5 @@
     "permissions":["tabs", "activeTab", "scripting"],
     "background": {
         "service_worker": "background.js"
-    },
-    "content_scripts": [
-        {
-            "js": ["scripts/content.js"],
-            "matches": [
-                "https://*.trainerize.com/app/*"
-            ]
-        }
-    ]
+    }
   }

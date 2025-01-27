@@ -1,3 +1,92 @@
+import './styles/app.scss'
+
+interface ErrorWithStatus extends Error {
+    status?: number
+}
+
+type Settings = {
+    stats: {
+        firstName: string
+        lastName: string
+    }
+}
+type Meal = {
+    hasImage: boolean
+    mealGuid: string
+    mealTime: string
+    name: string
+    caloriesSummary: number
+    proteinPercent: number
+    carbsPercent: number
+    fatPercent: number
+    proteinSummary: number
+    carbsSummary: number
+    fatSummary: number
+    foods: Food[]
+}
+
+type Food = {
+    name: string
+    amount: string
+    unit: string
+    calories: number
+}
+
+type Nutrition = {
+    nutrition: {
+        mealPhoto: {
+            id: number
+        }
+        date: string
+        calories: number
+        proteinGrams: number
+        proteinPercent: number
+        carbsGrams: number
+        carbsPercent: number
+        fatGrams: number
+        fatPercent: number
+        meals: Meal[]
+        goal: {
+            caloricGoal: number
+            proteinGrams: number
+            carbsGrams: number
+            fatGrams: number
+        }
+        nutrients: {
+            nutrNo: number
+            nutrVal: number
+        }[]
+    }
+}
+
+type MacroLabel = 'protein' | 'carbs' | 'fat'
+type Macro = {
+    grams: number
+    percent: number
+    goal: number
+}
+
+const BASE_URL = 'https://api.trainerize.com'
+
+async function api<T>(path: string, options?: RequestInit): Promise<T> {
+    const response = await fetch(`${BASE_URL}/${path}`, options);
+
+    if (!response.ok) {
+      const error = new Error(response.statusText) as ErrorWithStatus
+      error.status = response.status
+      throw error
+    }
+
+    const contentType = response.headers.get('Content-Type');
+
+    if (contentType && contentType.includes('application/json')) {
+      // Handle as JSON
+      return response.json() as T;
+    } else {
+      // Handle as Blob
+      return response as T
+    }
+}
 function last7Days(offset = 0) {
     var result = [];
     for (var i = offset; i < 7 + offset; i++) {
@@ -9,16 +98,16 @@ function last7Days(offset = 0) {
     return result.toReversed()
 }
 
-function formatDate(dateStr, options = {}) {
+function formatDate(dateStr: string, options: Intl.DateTimeFormatOptions = {}) {
     return new Date(dateStr).toLocaleDateString('en-US', {
         ...options,
         timeZone: options.timeZone || 'UTC'
     })
 }
-function getCookie(name) {
+function getCookie(name: string) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
+    if (parts.length === 2) return (parts.pop() as string).split(';').shift();
 }
 
 
@@ -31,36 +120,37 @@ function getCookie(name) {
         return alert('Please sign in again.')
     }
 
-    function getPhoto(photoId, mealId, size = "full") {
-        return fetch(`https://api.trainerize.com/v03/dailyNutrition/getMealPhoto?mealPhotoID=${photoId}&mealGuid=${mealId}&size=${size}`, {
+    function getPhoto(photoId: string, mealId: string, size = "full") {
+        return api<Response>(`v03/dailyNutrition/getMealPhoto?mealPhotoID=${photoId}&mealGuid=${mealId}&size=${size}`, {
             headers: {
                 Authorization: `Bearer ${getCookie('tz_uatoken')}`
             }
-        }).then(r => r.blob()).then(r => URL.createObjectURL(r)).catch(e => {
+        }).then(r => r.blob()).then(r => URL.createObjectURL(r)).catch(() => {
             console.log('error fetching image')
         })
     }
 
     function getPhotos() {
-        const photos = document.querySelectorAll('.meal--image[data-photo-id]')
+        const photos = document.querySelectorAll<HTMLDivElement>('.meal--image[data-photo-id][data-meal-id]')
 
         const requests = Array.from(photos).map(container => {
-            return getPhoto(container.dataset.photoId, container.dataset.mealId).then(r => {
+            return getPhoto(container.dataset.photoId!, container.dataset.mealId!).then(r => {
                 delete container.dataset.photoId
                 delete container.dataset.mealId
-
-                const img = document.createElement('img')
-                img.src = r
-                img.alt = 'meal photo'
-
-                container.insertAdjacentElement('afterbegin', img)
+                if (r) {
+                    const img = document.createElement('img')
+                    img.src = r
+                    img.alt = 'meal photo'
+    
+                    container.insertAdjacentElement('afterbegin', img)
+                }
             })
         })
 
         return Promise.allSettled(requests)
     }
 
-    function macroGoal(macro) {
+    function macroGoal(macro: Macro) {
         return {
             label: `${Math.round((macro.grams / macro.goal) * 100)}%`,
             average: `${Math.round(macro.grams / week.length)}g`,
@@ -70,19 +160,21 @@ function getCookie(name) {
 
 
     function getSettings() {
-        return fetch('https://api.trainerize.com/v03/user/getSettings', {
+        return api<Settings>('v03/user/getSettings', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`
             },
             body: JSON.stringify({ userid: uid })
-        }).then(r => r.json()).catch(e => { })
+        }).catch(() => { 
+            console.log('error getting settings')
+        })
     }
 
     try {
 
-        const requests = week.map(date => fetch('https://api.trainerize.com/v03/dailyNutrition/get', {
+        const requests = week.map(date => api<Nutrition>('v03/dailyNutrition/get', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -94,28 +186,25 @@ function getCookie(name) {
                 userid: uid
             })
         })
-            .then(response => {
-                if (!response.ok) {
-                    switch (response.status) {
-                        // Check if the response is not OK (status code not in the range 200-299)
-                        case 401: {
-                            throw new Error('Please sign in again.')
-                        }
-                        default: {
-                            throw new Error('Something went wrong. Please try again.')
-                        }
+            .catch((e: ErrorWithStatus) => {
+                switch (e.status) {
+                    // Check if the response is not OK (status code not in the range 200-299)
+                    case 401: {
+                        throw new Error('Please sign in again.')
+                    }
+                    default: {
+                        throw new Error('Something went wrong. Please try again.')
                     }
                 }
-
-                return response.json(); // Assuming the response is JSON
-            })
-            .catch(e => {
-                alert(e.message)
             }
-            ))
-        const logs = await Promise.allSettled(requests)
+        ))
+
+        const logs = await Promise.allSettled<Nutrition>(requests)
         const settings = await getSettings()
-        const macros = logs.reduce((acc, { value: data }) => {
+
+        const fullName = settings?.stats ? `${settings.stats.firstName} ${settings.stats.lastName}` : null
+
+        const macros = logs.filter(r => r.status === 'fulfilled').reduce((acc, { value: data }) => {
             acc.calories += data.nutrition.calories
             acc.caloricGoal += data.nutrition.goal.caloricGoal
             acc.protein.grams += data.nutrition.proteinGrams
@@ -127,7 +216,7 @@ function getCookie(name) {
             acc.fat.grams += data.nutrition.fatGrams
             acc.fat.percent += data.nutrition.fatPercent
             acc.fat.goal += data.nutrition.goal.fatGrams
-            acc.fiber += data.nutrition.nutrients.find(n => n.nutrNo === 291)?.nutrVal
+            acc.fiber += data.nutrition.nutrients.find(n => n.nutrNo === 291)?.nutrVal || 0
             return acc
         }, {
             calories: 0,
@@ -152,7 +241,7 @@ function getCookie(name) {
 
         const summary = `
             <div class="section">
-                <h1>${settings.stats.firstName} ${settings.stats.lastName}'s Meal Report (${formatDate(week[0])} - ${formatDate(week[week.length - 1])})</h1>
+                <h1>${fullName ? `${fullName}'s ` : ''} Meal Report (${formatDate(week[0])} - ${formatDate(week[week.length - 1])})</h1>
                 <h2>Macro distribution</h2>
                 <div class="bar-container">
                     <div class="bar">
@@ -184,7 +273,7 @@ function getCookie(name) {
                         <div class="label">${Math.round((macros.calories / macros.caloricGoal) * 100)}% (avg ${Math.round(macros.calories / week.length)})</div>
                     </div>
                 </div>
-                ${['protein', 'carbs', 'fat'].map(macro => `
+                ${(['protein', 'carbs', 'fat'] as MacroLabel[]).reduce((acc: string, macro: MacroLabel) => acc += `
                     <div class="bar-container">
                         <div class="bar">
                             <div class="${macro}" style="width: ${macroGoal(macros[macro]).percentage}%"></div>
@@ -194,14 +283,14 @@ function getCookie(name) {
                             <div class="label">${macroGoal(macros[macro]).label} (avg ${macroGoal(macros[macro]).average})</div>
                         </div>
                     </div>
-                `).join('')}
+                `, '')}
             </div>
         `
         document.body.classList.add('custom-trainerize-export-active')
         document.body.insertAdjacentHTML('afterbegin', '<div id="custom-trainerize-export"></div>')
-        document.querySelector('#custom-trainerize-export').insertAdjacentHTML('afterbegin', summary)
+        document.querySelector('#custom-trainerize-export')?.insertAdjacentHTML('afterbegin', summary)
 
-        logs.map(({ value: data }) => {
+        logs.filter(r => r.status === 'fulfilled').map(({ value: data }) => {
             const entryTemplate = `
                 <div class="pagebreak"></div>
                 <section class="daily-entry">
@@ -221,7 +310,6 @@ function getCookie(name) {
                         </div>
                         <div class="legend">
                             <div class="label">
-                                <!-- ${Math.round(data.nutrition.nutrients.find(n => n.nutrNo === 291)?.nutrVal)}g fiber -->
                                 <div class="icon protein"></div>Protein ${Math.round(data.nutrition.proteinGrams)}g (${Math.round(data.nutrition.proteinPercent * 100)}%)
                             </div>
                             <div class="label">
@@ -288,7 +376,7 @@ function getCookie(name) {
                     `).join('')}
                 </section>
             `
-            document.body.querySelector('#custom-trainerize-export').insertAdjacentHTML('beforeend', entryTemplate)
+            document.body.querySelector('#custom-trainerize-export')?.insertAdjacentHTML('beforeend', entryTemplate)
         })
 
         await getPhotos()

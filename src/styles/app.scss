@@ -1,24 +1,3 @@
-/* * {
-    display: none !important;
-}
-
-html,
-body,
-*:has(article),
-article,
-article * {
-    display: revert !important;
-}
-
-[role='navigation'] {
-    display: none !important;
-}
-
-article {
-    margin: auto;
-    max-width: 700px;
-} */
-
 body.custom-trainerize-export-active {
     font-family: sans-serif;
     color: #666;
@@ -48,17 +27,18 @@ body>*:not(#custom-trainerize-export) {
 
 #custom-trainerize-export {
     padding-bottom: 24px;
-}
 
-#custom-trainerize-export h1 {
-    text-align: center;
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-}
+    h1 {
+        text-align: center;
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
 
-#custom-trainerize-export h2 {
-    text-align: center;
-    font-size: 1.25rem;
+    #custom-trainerize-export h2 {
+        text-align: center;
+        font-size: 1.25rem;
+    }
+
 }
 
 
