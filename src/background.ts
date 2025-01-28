@@ -1,10 +1,10 @@
-const trainerize = '.trainerize.com/app'
+const trainerize = '.trainerize.com/app';
 
 chrome.runtime.onInstalled.addListener(async () => {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
     if (!tab?.url) {
-        return 
+        return; 
     }
 
     await chrome.action.setBadgeText({
@@ -14,17 +14,17 @@ chrome.runtime.onInstalled.addListener(async () => {
         await chrome.action.setIcon({
             tabId: tab.id,
             path: './assets/disabled.png',
-        })
+        });
     }
 });
 
 
 //listen for new tab to be activated
 chrome.tabs.onActivated.addListener(async function () {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
     if (!tab?.url) {
-        return
+        return;
     }
 
     if (!tab.url.includes(trainerize)) {
@@ -35,7 +35,7 @@ chrome.tabs.onActivated.addListener(async function () {
         await chrome.action.setIcon({
             tabId: tab.id,
             path: './assets/disabled.png',
-        })
+        });
     } else {
         await chrome.action.setBadgeText({
             tabId: tab.id,
@@ -45,13 +45,13 @@ chrome.tabs.onActivated.addListener(async function () {
         await chrome.action.setIcon({
             tabId: tab.id,
             path: './assets/apple-icon-57x57.png',
-        })
+        });
     }
 });
 
 //listen for current tab to be changed
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-    console.log('onUpdated', { tabId, changeInfo, tab })
+    console.log('onUpdated', { tabId, changeInfo, tab });
 });
 
 chrome.action.onClicked.addListener(async (tab) => {
@@ -77,7 +77,7 @@ chrome.action.onClicked.addListener(async (tab) => {
                 await chrome.scripting.executeScript({
                     target: { tabId: tab.id },
                     files: ["content.js"],
-                })
+                });
             } else if (nextState === "OFF") {
                 // Remove the CSS file when the user turns the extension off
                 await chrome.scripting.removeCSS({
@@ -88,7 +88,7 @@ chrome.action.onClicked.addListener(async (tab) => {
                 await chrome.scripting.executeScript({
                     target: { tabId: tab.id },
                     func: cleanup,
-                })
+                });
             }
         } else {
             // Set the action badge to the next state
@@ -101,9 +101,9 @@ chrome.action.onClicked.addListener(async (tab) => {
 });
 
 chrome.runtime.onMessage.addListener(
-    async function (request, sender, sendResponse) {
+    async function (request, sender) {
         if (!sender.tab?.id) {
-            return 
+            return;
         }
 
         console.log(sender.tab ?
@@ -124,14 +124,14 @@ chrome.runtime.onMessage.addListener(
             await chrome.scripting.executeScript({
                 target: { tabId: sender.tab.id },
                 func: cleanup,
-            })
+            });
         }
-        return true
+        return true;
     }
 );
 
 
 function cleanup() {
-    document.body.classList.remove('custom-trainerize-export-active')
-    document.querySelector('#custom-trainerize-export')?.remove()
+    document.body.classList.remove('custom-trainerize-export-active');
+    document.querySelector('#custom-trainerize-export')?.remove();
 }

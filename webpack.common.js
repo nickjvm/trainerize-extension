@@ -33,7 +33,7 @@ module.exports = {
             },
             // Treat src/css/app.css as a global stylesheet
             {
-                test: /\app.scss$/,
+                test: /app.scss$/,
                 use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader", "sass-loader"],
 
             },

@@ -1,27 +1,31 @@
+$calories: rgb(230, 183, 14);
+$fat: rgb(255, 153, 113);
+$carbs: rgb(15, 180, 195);
+$protein: rgb(55, 161, 108);
+
 body.custom-trainerize-export-active {
     font-family: sans-serif;
     color: #666;
     font-size: 14px;
-}
-
-@media screen {
-    body.custom-trainerize-export-active {
-        background: #EFEFEF;
+    @media (screen) {
+        background: #efefef;
         padding: 20px;
     }
 
-    body.custom-trainerize-export-active #custom-trainerize-export {
-        width: calc(100% - 40px);
-        max-width: 768px;
-        margin: auto;
-        background: white;
-        padding: 20px;
-        box-shadow: 0 0 20px -10px #555;
-        border-radius: 4px;
+    #custom-trainerize-export {
+        @media (screen) {
+            width: calc(100% - 40px);
+            max-width: 768px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 20px -10px #555;
+            border-radius: 4px;
+        }
     }
 }
 
-body>*:not(#custom-trainerize-export) {
+body > *:not(#custom-trainerize-export) {
     display: none !important;
 }
 
@@ -34,32 +38,30 @@ body>*:not(#custom-trainerize-export) {
         margin-bottom: 20px;
     }
 
-    #custom-trainerize-export h2 {
+    h2 {
         text-align: center;
         font-size: 1.25rem;
     }
 
-}
+    .calories {
+        background: $calories;
+    }
 
+    .fat {
+        background: $fat;
+    }
+
+    .carbs {
+        background: $carbs;
+    }
+
+    .protein {
+        background: $protein;
+    }
+}
 
 .section {
     margin-bottom: 30px;
-}
-
-.calories {
-    background: rgb(230, 183, 14);
-}
-
-.fat {
-    background: rgb(255, 153, 113);
-}
-
-.carbs {
-    background: rgb(15, 180, 195);
-}
-
-.protein {
-    background: rgb(55, 161, 108);
 }
 
 .bar-container {
@@ -75,12 +77,12 @@ body>*:not(#custom-trainerize-export) {
     overflow: hidden;
 }
 
-.bar>div:first-child {
+.bar > div:first-child {
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
 }
 
-.bar>div:last-child {
+.bar > div:last-child {
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
 }
@@ -117,10 +119,9 @@ body>*:not(#custom-trainerize-export) {
     text-align: left;
 }
 
-
 .daily-entry {
     margin-bottom: 30px;
-    border: 1px solid #EFEFEF;
+    border: 1px solid #efefef;
     padding: 0 8px 8px;
     border-radius: 8px;
     margin-bottom: 16px;
@@ -134,10 +135,10 @@ body>*:not(#custom-trainerize-export) {
 }
 
 .meal {
-    background: #FAFAFA;
+    background: #fafafa;
     margin: 0 -8px;
     padding: 16px;
-    border-bottom: 1px solid #E3E3E3;
+    border-bottom: 1px solid #e3e3e3;
     padding-bottom: 16px;
     display: flex;
     flex-wrap: nowrap;
@@ -176,7 +177,7 @@ body>*:not(#custom-trainerize-export) {
     border-radius: 8px;
 }
 .meal .meal--details {
-    flex-grow: 1
+    flex-grow: 1;
 }
 
 .meal--type {
@@ -202,9 +203,9 @@ body>*:not(#custom-trainerize-export) {
 }
 
 .meal-item:not(:last-child) {
-    margin: 0 0 .5rem;
-    padding: 0 0 .5rem;
-    border-bottom: 1px solid #E3E3E3;
+    margin: 0 0 0.5rem;
+    padding: 0 0 0.5rem;
+    border-bottom: 1px solid #e3e3e3;
 }
 
 .meal-item--name {
@@ -212,13 +213,12 @@ body>*:not(#custom-trainerize-export) {
 }
 
 .meal-item--size {
-    font-size: .75rem;
+    font-size: 0.75rem;
 }
 
 .meal-item p {
     margin: 0;
 }
-
 
 @media print {
     body {
