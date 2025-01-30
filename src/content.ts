@@ -1,8 +1,6 @@
 import './styles/app.scss';
 
-interface ErrorWithStatus extends Error {
-    status?: number
-}
+import { api, formatDate, getCookie, last7Days } from '@/helpers';
 
 type Settings = {
     stats: {
@@ -10,6 +8,7 @@ type Settings = {
         lastName: string
     }
 }
+
 type Meal = {
     hasImage: boolean
     mealGuid: string
@@ -47,9 +46,9 @@ type Nutrition = {
         fatPercent: number
         meals: Meal[]
         goal: {
-            caloricGoal: number
-            proteinGrams: number
-            carbsGrams: number
+        caloricGoal: number
+        proteinGrams: number
+        carbsGrams: number
             fatGrams: number
         }
         nutrients: {
@@ -60,56 +59,12 @@ type Nutrition = {
 }
 
 type MacroLabel = 'protein' | 'carbs' | 'fat'
+
 type Macro = {
     grams: number
     percent: number
     goal: number
 }
-
-const BASE_URL = 'https://api.trainerize.com';
-
-async function api<T>(path: string, options?: RequestInit): Promise<T> {
-    const response = await fetch(`${BASE_URL}/${path}`, options);
-
-    if (!response.ok) {
-      const error = new Error(response.statusText) as ErrorWithStatus;
-      error.status = response.status;
-      throw error;
-    }
-
-    const contentType = response.headers.get('Content-Type');
-
-    if (contentType && contentType.includes('application/json')) {
-      // Handle as JSON
-      return response.json() as T;
-    } else {
-      // Handle as Blob
-      return response as T;
-    }
-}
-function last7Days(offset = 0) {
-    const result = [];
-    for (let i = offset; i < 7 + offset; i++) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        result.push(d.toISOString().split('T')[0]);
-    }
-
-    return result.toReversed();
-}
-
-function formatDate(dateStr: string, options: Intl.DateTimeFormatOptions = {}) {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-        ...options,
-        timeZone: options.timeZone || 'UTC'
-    });
-}
-function getCookie(name: string) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return (parts.pop() as string).split(';').shift();
-}
-
 
 (async function () {
     const week = last7Days(1);
@@ -117,6 +72,8 @@ function getCookie(name: string) {
     const uid = getCookie('tz_uid');
 
     if (!token || !uid) {
+        // https://1percentbettercoaching.trainerize.com/app/login
+        // https://1percentbettercoaching.trainerize.com/app/sessionEnd
         return alert('Please sign in again.');
     }
 
@@ -197,7 +154,7 @@ function getCookie(name: string) {
                     }
                 }
             }
-        ));
+            ));
 
         const logs = await Promise.allSettled<Nutrition>(requests);
         const settings = await getSettings();
@@ -296,11 +253,11 @@ function getCookie(name: string) {
                 <section class="daily-entry">
                     <header>
                         <h2>${formatDate(data.nutrition.date, {
-                weekday: "short",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-            })}</h2>
+        weekday: "short",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    })}</h2>
                     </header>
                     <div class="bar-container">
                         <div class="bar">

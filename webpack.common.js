@@ -17,7 +17,7 @@ module.exports = {
         })
     ],
     entry: {
-        content: path.join(__dirname, "src/content.ts"),
+        content: path.join(__dirname, "src/index.tsx"),
         background: path.join(__dirname, "src/background.ts"),
     },
     output: {
@@ -55,9 +55,9 @@ module.exports = {
     },
     // Setup @src path resolution for TypeScript files
     resolve: {
-        extensions: [".ts", ".js"],
+        extensions: [".ts", ".js", ".tsx", ".jsx"],
         alias: {
-            "@src": path.resolve(__dirname, "src/"),
+            "@": path.resolve(__dirname, "src/"),
         },
     },
 };
