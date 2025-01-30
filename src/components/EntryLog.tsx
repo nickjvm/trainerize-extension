@@ -11,6 +11,7 @@ export default function EntryLog({ date, data }: Props) {
             <div className="pagebreak" /><h2>No data for {date}</h2>
         </>;
     }
+
     return (
         <>
             <div className="pagebreak"></div>
@@ -52,7 +53,7 @@ export default function EntryLog({ date, data }: Props) {
                         <div className="label">{data.nutrition.goal.caloricGoal - data.nutrition.calories} remaining</div>
                     </div>
                 </div>
-                {data.nutrition.meals.map(meal => <Meal mealPhotoId={data.nutrition.mealPhoto?.id} meal={meal} />)}
+                {data.nutrition.meals.map(meal => <Meal mealPhotoId={data.nutrition.mealPhoto?.id} meal={meal} key={meal.id} />)}
             </section>
         </>
     );

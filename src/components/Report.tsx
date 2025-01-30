@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import Summary from "./Summary";
-import { DiaryContextProvider } from "./DiaryContext";
+import { DiaryContext, DiaryContextProvider } from "./DiaryContext";
 import DailyEntries from "./Entries";
 
-export default function Report() {
+export function Report() {
+    const { isLoading } = useContext(DiaryContext);
 
     useEffect(() => {
         document.body.classList.add('custom-trainerize-export-active');
@@ -11,10 +12,23 @@ export default function Report() {
             document.body.classList.remove('custom-trainerize-export-active');
         };
     });
+
+    if (isLoading) {
+        return <h2>Loading...</h2>;
+    }
+
     return (
-        <DiaryContextProvider>
+        <>
             <Summary />
             <DailyEntries />
-        </DiaryContextProvider>
+        </>
     );
 }
+
+export default function App() {
+    return (
+        <DiaryContextProvider>
+            <Report />
+        </DiaryContextProvider>
+    );
+};

@@ -9,8 +9,6 @@ type Settings = {
     }
 }
 
-
-
 type MacroLabel = 'protein' | 'carbs' | 'fat'
 
 type Macro = {
@@ -128,7 +126,7 @@ export default function Summary() {
                         <div className="calories" style={{ width: `${(macros.calories / macros.caloricGoal) * 100}%` }}></div>
                     </div>
                     <div className="legend">
-                        <div className="label">Calories ${Math.round(macros.caloricGoal / week.length)}</div>
+                        <div className="label">Calories {Math.round(macros.caloricGoal / week.length)}</div>
                         <div className="label">{Math.round((macros.calories / macros.caloricGoal) * 100)}% (avg {Math.round(macros.calories / week.length)})</div>
                     </div>
                 </div>
