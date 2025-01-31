@@ -1,13 +1,6 @@
-import { api, formatDate, getCookie } from "@/helpers";
-import { useContext, useEffect, useState } from "react";
+import { formatDate } from "@/helpers";
+import { useContext } from "react";
 import { DiaryContext } from "./DiaryContext";
-
-type Settings = {
-    stats: {
-        firstName: string
-        lastName: string
-    }
-}
 
 type MacroLabel = 'protein' | 'carbs' | 'fat'
 
@@ -39,10 +32,9 @@ const baseMacros = {
 };
 
 export default function Summary() {
-    const [fullName, setFullName] = useState('');
+    const { week, data, settings } = useContext(DiaryContext);
 
-
-    const { week, data } = useContext(DiaryContext);
+    const fullName = settings ? `${settings.stats.firstName} ${settings.stats.lastName}` : '';
 
     const macros = data.reduce((acc, data) => {
         if (data?.nutrition) {
@@ -61,31 +53,6 @@ export default function Summary() {
         }
         return acc;
     }, { ...baseMacros });
-
-
-    useEffect(() => {
-        const token = getCookie("tz_uatoken");
-        const uid = getCookie("tz_uid");
-
-        if (token && uid) {
-            getSettings(token, uid);
-        }
-    }, []);
-
-    function getSettings(token: string, uid: string) {
-        return api<Settings>('v03/user/getSettings', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify({ userid: uid })
-        }).then(({ stats }) => {
-            setFullName(`${stats.firstName} ${stats.lastName}`);
-        }).catch(() => {
-            console.log('error getting settings');
-        });
-    }
 
     function macroGoal(macro: Macro) {
         return {

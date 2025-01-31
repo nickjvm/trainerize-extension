@@ -2,6 +2,12 @@ interface ErrorWithStatus extends Error {
     status?: number
 }
 
+type Settings = {
+    stats: {
+        firstName: string
+        lastName: string
+    }
+}
 
 type Nutrition = {
     nutrition: {

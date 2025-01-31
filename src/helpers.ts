@@ -4,7 +4,7 @@ export async function api<T>(path: string, options?: RequestInit): Promise<T> {
     const response = await fetch(`${BASE_URL}/${path}`, options);
 
     if (!response.ok) {
-        const error = new Error(response.statusText) as ErrorWithStatus;
+        const error = new Error(response.statusText || `${response.status}`) as ErrorWithStatus;
         error.status = response.status;
         throw error;
     }
