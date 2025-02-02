@@ -10,8 +10,6 @@
     "57": "assets/apple-icon-57x57.png"
   },
   "permissions": [
-    "tabs",
-    "activeTab",
     "scripting"
   ],
   "host_permissions": [
