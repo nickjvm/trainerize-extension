@@ -54,13 +54,13 @@ export default function Meal({ meal, mealPhotoId }: Props) {
                     </div>
                     <div className="legend">
                         <div className="label">
-                            <div className="icon protein"></div>Protein {Math.round(meal.proteinSummary)} ({Math.round(meal.proteinPercent)}%)
+                            <div className="icon protein"></div>Protein {Math.round(meal.proteinSummary)}g ({Math.round(meal.proteinPercent)}%)
                         </div>
                         <div className="label">
-                            <div className="icon carbs"></div>Carbs {Math.round(meal.carbsSummary)} ({Math.round(meal.carbsPercent)}%)
+                            <div className="icon carbs"></div>Carbs {Math.round(meal.carbsSummary)}g ({Math.round(meal.carbsPercent)}%)
                         </div>
                         <div className="label">
-                            <div className="icon fat"></div>Fat {Math.round(meal.fatSummary)} ({Math.round(meal.fatPercent)}%)
+                            <div className="icon fat"></div>Fat {Math.round(meal.fatSummary)}g ({Math.round(meal.fatPercent)}%)
                         </div>
                     </div>
                 </div>

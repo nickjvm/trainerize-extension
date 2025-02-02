@@ -243,16 +243,16 @@ $protein: rgb(55, 161, 108);
 }
 
 @media print {
-    body > *:not(#custom-trainerize-export) {
+    body.custom-trainerize-export-active > *:not(#custom-trainerize-export) {
         display: none !important;
     }
-    body > #custom-trainerize-export {
+    body.custom-trainerize-export-active > #custom-trainerize-export {
         display: block;
     }
 }
 
 @media screen {
-    body > #custom-trainerize-export {
+    body.custom-trainerize-export-active > #custom-trainerize-export {
         display: none !important;
     }
 }

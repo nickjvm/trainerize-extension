@@ -109,8 +109,9 @@ function injectDownloadButton() {
                 el.setAttribute('disabled', 'disabled');
 
                 window.onafterprint = () => {
-                    el.removeAttribute('disabled');
+                    document.body.classList.remove('custom-trainerize-export-active');
                     document.querySelector('#custom-trainerize-export')?.remove();
+                    el.removeAttribute('disabled');
                 };
             }
 
