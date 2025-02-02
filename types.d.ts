@@ -35,3 +35,27 @@ type Nutrition = {
         }[]
     }
 }
+
+
+type Meal = {
+    hasImage: boolean
+    mealGuid: string
+    mealTime: string
+    name: string
+    caloriesSummary: number
+    proteinPercent: number
+    carbsPercent: number
+    fatPercent: number
+    proteinSummary: number
+    carbsSummary: number
+    fatSummary: number
+    foods: Food[]
+}
+
+type Food = {
+    foodId: number
+    name: string
+    amount: string
+    unit: string
+    calories: number
+}

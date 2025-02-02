@@ -4,14 +4,16 @@ import { DiaryContext, DiaryContextProvider } from "./DiaryContext";
 import DailyEntries from "./Entries";
 
 export function Report() {
-    const { isLoading } = useContext(DiaryContext);
+    const { isLoading, data, settings } = useContext(DiaryContext);
 
     useEffect(() => {
-        document.body.classList.add('custom-trainerize-export-active');
-        return () => {
-            document.body.classList.remove('custom-trainerize-export-active');
-        };
-    });
+        if (!isLoading && data && settings) {
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+    }, [isLoading, data, settings]);
+
 
     if (isLoading) {
         return <h2>Loading...</h2>;

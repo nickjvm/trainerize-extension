@@ -53,7 +53,7 @@ export default function EntryLog({ date, data }: Props) {
                         <div className="label">{data.nutrition.goal.caloricGoal - data.nutrition.calories} remaining</div>
                     </div>
                 </div>
-                {data.nutrition.meals.map(meal => <Meal mealPhotoId={data.nutrition.mealPhoto?.id} meal={meal} key={meal.id} />)}
+                {data.nutrition.meals.map(meal => <Meal mealPhotoId={data.nutrition.mealPhoto?.id} meal={meal} key={meal.mealGuid} />)}
             </section>
         </>
     );

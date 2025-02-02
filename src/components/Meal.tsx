@@ -2,29 +2,6 @@ import { api } from "@/helpers";
 import { useContext, useEffect, useState } from "react";
 import { DiaryContext } from "./DiaryContext";
 
-type Meal = {
-    hasImage: boolean
-    mealGuid: string
-    mealTime: string
-    name: string
-    caloriesSummary: number
-    proteinPercent: number
-    carbsPercent: number
-    fatPercent: number
-    proteinSummary: number
-    carbsSummary: number
-    fatSummary: number
-    foods: Food[]
-}
-
-type Food = {
-    foodId: number
-    name: string
-    amount: string
-    unit: string
-    calories: number
-}
-
 type Props = {
     meal: Meal
     mealPhotoId?: number

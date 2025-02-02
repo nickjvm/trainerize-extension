@@ -3,32 +3,6 @@ $fat: rgb(255, 153, 113);
 $carbs: rgb(15, 180, 195);
 $protein: rgb(55, 161, 108);
 
-body.custom-trainerize-export-active {
-    font-family: sans-serif;
-    color: #666;
-    font-size: 14px;
-    @media (screen) {
-        background: #efefef;
-        padding: 20px;
-    }
-
-    #custom-trainerize-export {
-        @media (screen) {
-            width: calc(100% - 40px);
-            max-width: 768px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            box-shadow: 0 0 20px -10px #555;
-            border-radius: 4px;
-        }
-    }
-}
-
-body > *:not(#custom-trainerize-export) {
-    display: none !important;
-}
-
 #custom-trainerize-export {
     padding-bottom: 24px;
 
@@ -220,6 +194,41 @@ body > *:not(#custom-trainerize-export) {
     margin: 0;
 }
 
+.tpe-print-button {
+    position: relative;
+    &:hover span,
+    &:focus-visible span {
+        opacity: 1;
+    }
+    &:disabled span {
+        opacity: 0;
+    }
+    span {
+        position: absolute;
+        top: calc(100% + 7px);
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        color: white;
+        background: rgb(34, 158, 212);
+        padding: 3px 6px;
+        border-radius: 4px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s;
+        &:before {
+            content: "";
+            border: 7px solid;
+            border-color: transparent transparent rgb(34, 158, 212) transparent;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, -7px);
+            border-top-width: 0;
+        }
+    }
+}
+
 @media print {
     body {
         padding: 0 !important;
@@ -230,5 +239,20 @@ body > *:not(#custom-trainerize-export) {
     }
     #custom-trainerize-export {
         padding-bottom: 0;
+    }
+}
+
+@media print {
+    body > *:not(#custom-trainerize-export) {
+        display: none !important;
+    }
+    body > #custom-trainerize-export {
+        display: block;
+    }
+}
+
+@media screen {
+    body > #custom-trainerize-export {
+        display: none !important;
     }
 }
