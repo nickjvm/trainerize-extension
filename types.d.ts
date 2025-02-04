@@ -6,6 +6,7 @@ type Settings = {
     stats: {
         firstName: string
         lastName: string
+        mediaSexPreference: "male" | "female"
     }
 }
 

@@ -9,7 +9,9 @@ export function Report() {
     useEffect(() => {
         if (!isLoading && data && settings) {
             setTimeout(() => {
-                window.print();
+                if (process.env.NODE_ENV === 'production') {
+                    window.print();
+                }
             }, 500);
         }
     }, [isLoading, data, settings]);

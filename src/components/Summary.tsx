@@ -1,8 +1,10 @@
 import { formatDate } from "@/helpers";
 import { useContext } from "react";
 import { DiaryContext } from "./DiaryContext";
+import cn from 'classnames';
 
 type MacroLabel = 'protein' | 'carbs' | 'fat'
+type MicroLabel = 'fiber'
 
 type Macro = {
     grams: number
@@ -28,13 +30,18 @@ const baseMacros = {
         percent: 0,
         grams: 0,
     },
-    fiber: 0
+    fiber: {
+        goal: 0,
+        percent: 0,
+        grams: 0,
+    }
 };
 
 export default function Summary() {
     const { week, data, settings } = useContext(DiaryContext);
 
     const fullName = settings ? `${settings.stats.firstName} ${settings.stats.lastName}` : '';
+    const dailyFiberGoal = settings?.stats.mediaSexPreference === 'male' ? 38 : 25;
 
     const macros = data.reduce((acc, data) => {
         if (data?.nutrition) {
@@ -49,7 +56,11 @@ export default function Summary() {
             acc.fat.grams += data.nutrition.fatGrams;
             acc.fat.percent += data.nutrition.fatPercent;
             acc.fat.goal += data.nutrition.goal.fatGrams;
-            acc.fiber += data.nutrition.nutrients.find(n => n.nutrNo === 291)?.nutrVal || 0;
+
+            acc.fiber.grams += data.nutrition.nutrients.find(n => n.nutrNo === 291)?.nutrVal || 0;
+            acc.fiber.goal += dailyFiberGoal;
+            acc.fiber.percent += acc.fiber.grams / dailyFiberGoal;
+
         }
         return acc;
     }, { ...baseMacros });
@@ -93,18 +104,22 @@ export default function Summary() {
                         <div className="calories" style={{ width: `${(macros.calories / macros.caloricGoal) * 100}%` }}></div>
                     </div>
                     <div className="legend">
-                        <div className="label">Calories {Math.round(macros.caloricGoal / week.length)}</div>
-                        <div className="label">{Math.round((macros.calories / macros.caloricGoal) * 100)}% (avg {Math.round(macros.calories / week.length)})</div>
+                        <div className="label">Calories {Math.round(macros.caloricGoal / week.length)} / {Math.round(macros.calories / week.length)}</div>
+                        <div className="label">{Math.round((macros.calories / macros.caloricGoal) * 100)}%</div>
                     </div>
                 </div>
-                {(['protein', 'carbs', 'fat'] as MacroLabel[]).map((macro: MacroLabel) =>
-                    <div className="bar-container" key={macro}>
+                {(['protein', 'carbs', 'fiber', 'fat'] as (MacroLabel | MicroLabel)[]).map((macro: MacroLabel | MicroLabel) =>
+                    <div className={cn(
+                        'bar-container',
+                        macro === 'fiber' && 'bar-micro',
+                        macroGoal(macros[macro]).percentage > 100 && 'bar-exceeded'
+                    )} key={macro}>
                         <div className="bar">
                             <div className={macro} style={{ width: `${macroGoal(macros[macro]).percentage}%` }} />
                         </div>
                         <div className="legend">
-                            <div className="label">{macro} {Math.round(macros[macro].goal / week.length)}g</div>
-                            <div className="label">{macroGoal(macros[macro]).label} (avg {macroGoal(macros[macro]).average})</div>
+                            <div className="label">{macro} {macroGoal(macros[macro]).average} / {Math.round(macros[macro].goal / week.length)}g</div>
+                            <div className="label">{macroGoal(macros[macro]).label}</div>
                         </div>
                     </div>
                 )}
