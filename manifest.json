@@ -1,6 +1,6 @@
 {
   "name": "Trainerize Weekly Meal Export",
-  "description": "Export the past 7 days of meals as a table that can be printed or downloaded as a PDF",
+  "description": "Export the past 7 days of meals as a table that can be printed or downloaded as a PDF.",
   "version": "1.0",
   "manifest_version": 3,
   "action": {
