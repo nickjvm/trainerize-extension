@@ -1,24 +1,21 @@
 {
-    "name": "Trainerize Weekly Meal Export",
-    "description": "Export the past 7 days of meals as a table that can be printed or downloaded as a PDF",
-    "version": "1.0",
-    "manifest_version": 3,
-    "action": {
-      "default_icon": "assets/apple-icon-57x57.png"
-    },
-    "icons": {
-        "57": "assets/apple-icon-57x57.png"
-    },
-    "permissions":["tabs", "activeTab", "scripting"],
-    "background": {
-        "service_worker": "background.js"
-    },
-    "content_scripts": [
-        {
-            "js": ["scripts/content.js"],
-            "matches": [
-                "https://*.trainerize.com/app/*"
-            ]
-        }
-    ]
+  "name": "Trainerize Weekly Meal Export",
+  "description": "Export the past 7 days of meals as a table that can be printed or downloaded as a PDF",
+  "version": "1.0",
+  "manifest_version": 3,
+  "action": {
+    "default_icon": "assets/apple-icon-57x57.png"
+  },
+  "icons": {
+    "57": "assets/apple-icon-57x57.png"
+  },
+  "permissions": [
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://*.trainerize.com/app/client/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
   }
+}
