@@ -50,7 +50,10 @@ export default function EntryLog({ date, data }: Props) {
                         </div>
                     </div>
                 </div>
-                <div className={cn('bar-container', data.nutrition.calories > data.nutrition.goal.caloricGoal && 'bar-exceeded')} >
+                <div className={cn(
+                    'bar-container',
+                    data.nutrition.calories > data.nutrition.goal.caloricGoal && 'bar-exceeded'
+                )} >
                     <div className="bar">
                         <div className="calories" style={{ width: `${(data.nutrition.calories / data.nutrition.goal.caloricGoal) * 100}%` }} />
                     </div>
@@ -61,7 +64,9 @@ export default function EntryLog({ date, data }: Props) {
                         <div className="label">{Math.max(0, Math.round(data.nutrition.goal.caloricGoal - data.nutrition.calories))} remaining</div>
                     </div>
                 </div>
-                <div className={cn('bar-container', dailyFiber > dailyFiberGoal && 'bar-exceeded')}>
+                <div className={cn(
+                    'bar-container', dailyFiber > dailyFiberGoal && 'bar-exceeded'
+                )}>
                     <div className="bar" >
                         <div className="fiber" style={{ width: `${(dailyFiber / dailyFiberGoal) * 100}%` }} />
                     </div>
