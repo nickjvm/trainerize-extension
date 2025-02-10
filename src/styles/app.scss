@@ -1,7 +1,9 @@
 $calories: rgb(230, 183, 14);
 $fat: rgb(255, 153, 113);
 $carbs: rgb(15, 180, 195);
+$fiber: rgb(15, 180, 195);
 $protein: rgb(55, 161, 108);
+$exceeded: rgb(230, 83, 99);
 
 #custom-trainerize-export {
     padding-bottom: 24px;
@@ -25,173 +27,167 @@ $protein: rgb(55, 161, 108);
         background: $fat;
     }
 
-    .carbs {
+    .carbs,
+    .fiber {
         background: $carbs;
+    }
+
+    .fiber {
+        background: fade-out($color: $carbs, $amount: 0.3);
     }
 
     .protein {
         background: $protein;
     }
-}
 
-.section {
-    margin-bottom: 30px;
-}
+    .section {
+        margin-bottom: 30px;
+    }
 
-.bar-container {
-    margin: 10px 0 15px;
-}
+    .bar-container {
+        margin: 10px 0 15px;
 
-.bar {
-    height: 10px;
-    background: #dae0e6;
-    border-radius: 4px;
-    display: flex;
-    align-items: stretch;
-    overflow: hidden;
-}
+        &.bar-micro {
+            margin-left: 25px;
+        }
+        &.bar-exceeded {
+            .bar > div,
+            .legend .icon {
+                background: $exceeded;
+            }
+            .legend > .label:last-child {
+                color: $exceeded;
+                font-weight: bold;
+            }
+        }
+        .bar {
+            height: 10px;
+            background: #dae0e6;
+            border-radius: 4px;
+            display: flex;
+            align-items: stretch;
+            overflow: hidden;
+            > div:first-child {
+                border-top-left-radius: 4px;
+                border-bottom-left-radius: 4px;
+            }
+            > div:last-child {
+                border-top-right-radius: 4px;
+                border-bottom-right-radius: 4px;
+            }
+        }
+        .icon {
+            width: 10px;
+            height: 10px;
+            display: inline-block;
+            margin-right: 4px;
+            border-radius: 100%;
+        }
+        .legend {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
 
-.bar > div:first-child {
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
-}
+            .label::first-letter {
+                text-transform: capitalize;
+            }
+        }
+    }
 
-.bar > div:last-child {
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-}
+    .daily-entry {
+        margin-bottom: 30px;
+        border: 1px solid #efefef;
+        padding: 0 8px 8px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        overflow: hidden;
+        h2 {
+            text-align: left !important;
+            margin: 8px 0;
+            font-size: 1.125rem !important;
+        }
+    }
 
-#custom-trainerize-export .icon {
-    width: 10px;
-    height: 10px;
-    display: inline-block;
-    margin-right: 4px;
-    border-radius: 100%;
-}
+    .meal {
+        background: #fafafa;
+        margin: 0 -8px;
+        padding: 16px;
+        border-bottom: 1px solid #e3e3e3;
+        padding-bottom: 16px;
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 16px;
+        &:last-child {
+            margin-bottom: -8px;
+            padding-bottom: 16px;
+            border-bottom-width: 0;
+        }
 
-.legend {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 5px;
-}
+        h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 1rem;
+        }
+        .meal--type {
+            text-transform: capitalize;
+            font-size: 1rem;
+        }
 
-.legend .label::first-letter {
-    text-transform: capitalize;
-}
+        .meal--calories {
+            margin-left: auto;
+            font-size: 1rem;
+            font-weight: normal;
+        }
 
-.table {
-    border-collapse: collapse;
-}
+        .meal--image {
+            width: 25%;
+        }
 
-.table th,
-.table td {
-    padding: 4px 8px;
-    border: 1px solid #dae0e6;
-}
+        .meal--image img {
+            width: 100%;
+            border-radius: 8px;
+        }
+        .meal--details {
+            flex-grow: 1;
+        }
 
-.table tbody th {
-    text-align: left;
-}
+        .meal--timestamp {
+            font-size: 1rem;
+            font-weight: normal;
+        }
 
-.daily-entry {
-    margin-bottom: 30px;
-    border: 1px solid #efefef;
-    padding: 0 8px 8px;
-    border-radius: 8px;
-    margin-bottom: 16px;
-    overflow: hidden;
-}
+        .meal-items {
+            list-style-type: none;
+            padding: 0;
+            margin: 16px 0 0;
+        }
 
-.daily-entry h2 {
-    text-align: left !important;
-    margin: 8px 0;
-    font-size: 1.125rem !important;
-}
+        .meal-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: space-between;
 
-.meal {
-    background: #fafafa;
-    margin: 0 -8px;
-    padding: 16px;
-    border-bottom: 1px solid #e3e3e3;
-    padding-bottom: 16px;
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 16px;
-}
+            &:not(:last-child) {
+                margin: 0 0 0.5rem;
+                padding: 0 0 0.5rem;
+                border-bottom: 1px solid #e3e3e3;
+            }
 
-.meal:last-child {
-    margin-bottom: -8px;
-    padding-bottom: 16px;
-    border-bottom-width: 0;
-}
+            p {
+                margin: 0;
+            }
+        }
 
-.meal h3 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0 0 1rem;
-}
+        .meal-item--name {
+            font-size: 1rem;
+        }
 
-.meal .meal--type {
-    text-transform: capitalize;
-}
-
-.meal .meal--calories {
-    margin-left: auto;
-    font-size: 1rem;
-    font-weight: normal;
-}
-
-.meal .meal--image {
-    width: 25%;
-}
-
-.meal .meal--image img {
-    width: 100%;
-    border-radius: 8px;
-}
-.meal .meal--details {
-    flex-grow: 1;
-}
-
-.meal--type {
-    font-size: 1rem;
-}
-
-.meal--timestamp {
-    font-size: 1rem;
-    font-weight: normal;
-}
-
-.meal-items {
-    list-style-type: none;
-    padding: 0;
-    margin: 16px 0 0;
-}
-
-.meal-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    justify-content: space-between;
-}
-
-.meal-item:not(:last-child) {
-    margin: 0 0 0.5rem;
-    padding: 0 0 0.5rem;
-    border-bottom: 1px solid #e3e3e3;
-}
-
-.meal-item--name {
-    font-size: 1rem;
-}
-
-.meal-item--size {
-    font-size: 0.75rem;
-}
-
-.meal-item p {
-    margin: 0;
+        .meal-item--size {
+            font-size: 0.75rem;
+        }
+    }
 }
 
 .tpe-print-button {
