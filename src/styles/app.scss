@@ -1,9 +1,11 @@
-$calories: rgb(230, 183, 14);
-$fat: rgb(255, 153, 113);
-$carbs: rgb(15, 180, 195);
-$fiber: rgb(15, 180, 195);
-$protein: rgb(55, 161, 108);
-$exceeded: rgb(230, 83, 99);
+@use "sass:color";
+
+$calories: #e6b70e;
+$fat: #ff9971;
+$carbs: #0fb4c3;
+$fiber: #0fb4c3;
+$protein: #37a16c;
+$exceeded: #e65363;
 
 #custom-trainerize-export {
     padding-bottom: 24px;
@@ -33,7 +35,7 @@ $exceeded: rgb(230, 83, 99);
     }
 
     .fiber {
-        background: fade-out($color: $carbs, $amount: 0.3);
+        background: color.adjust($carbs, $lightness: 15%);
     }
 
     .protein {
